@@ -10,5 +10,13 @@ module.exports = (() => {
         
     });
 
+    router.post("/signup", (req, res) => {
+        let username    = res.body.username;
+        let email       = res.body.email;
+        let password    = res.body.passowrd;
+
+        
+    });
+
     return router;
 })();

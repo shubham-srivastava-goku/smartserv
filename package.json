@@ -9,9 +9,10 @@
   "author": "Shubham Srivastava",
   "license": "ISC",
   "dependencies": {
-    "express": ""
+    "express": "",
+    "express-session": ""
   },
-  "engines" : {
-    "node" : "8.10.0"
+  "engines": {
+    "node": "8.10.0"
   }
 }
