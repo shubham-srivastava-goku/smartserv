@@ -1,10 +1,10 @@
 <html>
 
 <head>
-    <link href="css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link href="css/style.css" rel="stylesheet" id="bootstrap-css">
-    <script src="js/jquery-3.2.1.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="/css/style.css" rel="stylesheet" id="bootstrap-css">
+    <script src="/js/jquery-3.2.1.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -28,10 +28,10 @@
                             <div class="col-lg-12">
                                 <form id="login-form" method="post" role="form" style="display: block;">
                                     <div class="form-group">
-                                        <input type="text" name="username" id="username_login" tabindex="1" class="form-control" placeholder="Username" value="">
+                                        <input type="text" name="username_login" id="username_login" tabindex="1" class="form-control" placeholder="Email" value="">
                                     </div>
                                     <div class="form-group">
-                                        <input type="password" name="password" id="password_login" tabindex="2" class="form-control" placeholder="Password">
+                                        <input type="password" name="password_login" id="password_login" tabindex="2" class="form-control" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <div class="row">
@@ -91,13 +91,48 @@
         $("#login-form").submit((e) => {
             e.preventDefault();
 
+            let tempData = $('#login-form').serializeArray();
 
+            let data = tempData.reduce((x, y) => {
+                x[y.name] = y.value;
+
+                return x;
+            }, {});
+
+            $.ajax({
+                url : "/login",
+                type : "POST",
+                data : data,
+                success : (res) => {
+                    console.log(res);
+                    if(res.indexOf("success") !== -1) {
+                        window.location.href = "/view/index.html";
+                    } else {
+                        alert("Email or password is not correct.");
+                    }
+                }
+            });
         });
 
         $("#register-form").submit((e) => {
             e.preventDefault();
 
-            
+            let tempData = $('#register-form').serializeArray();
+
+            let data = tempData.reduce((x, y) => {
+                x[y.name] = y.value;
+
+                return x;
+            }, {});
+
+            $.ajax({
+                url : "/signup",
+                type : "POST",
+                data : data,
+                success : (res) => {
+                    console.log(res);
+                }
+            });
         });
 
     </script>

@@ -4,13 +4,17 @@ var MongoClient     = require("mongodb").MongoClient
 let mongoOptions    = config.mongoConfig;
 
 exports.getData = (query) => {
-    var url = "mongodb://" + mongoOptions.ip + ":" + mongoOptions.port;
     return new Promise((r,x) => {
+        var url = "mongodb://" + mongoOptions.ip + ":" + mongoOptions.port;
         MongoClient.connect(url, (err, client) => {
+            if(err)
+                console.log(err);
             const db    = client.db(mongoOptions.database);
             const col   = db.collection(mongoOptions.collection);
     
             col.find(query).toArray((err, data) => {
+                if(err)
+                    console.log(err);
                 client.close();
                 r(data);
             });
@@ -24,10 +28,13 @@ exports.insert = (query) => {
         MongoClient.connect(url, (err, client) => {
             const db    = client.db(mongoOptions.database);
             const col   = db.collection(mongoOptions.collection);
-    
-            col.find(query).toArray((err, data) => {
-                client.close();
-                r(data);
+            
+            col.insert(query, (err, res) => {
+                if(err) {
+                    console.log(err);
+                }
+
+                r(res);
             });
         }); 
     });

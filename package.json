@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "",
-    "express-session": ""
+    "express-session": "",
+    "mongodb" : ""
   },
   "engines": {
     "node": "8.10.0"
