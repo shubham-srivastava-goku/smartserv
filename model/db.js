@@ -47,26 +47,19 @@ exports.update = (query, updateData) => {
             MongoClient.connect(url, (err, client) => {
                 const db    = client.db(mongoOptions.database);
                 const col   = db.collection(mongoOptions.collection);
-    
-                col.find(query).toArray((err, data) => {
-                    
-                    for(let i in data[0].data) {
-                        console.log(data[0].data[i]);
-    
-                        let chatData = data[0].data[i];
-                        chatData.push(obj);
-    
-                        let update = {$set : { "data" : {i : chatData} }};
-    
-                        col.updateOne(search, update, function(err, res) {
-                            if(err) 
-                                throw err;
-    
-                            client.close();
 
-                            r("");
-                        });
-                    }
+                let update = {$set : updateData};
+
+                col.updateOne(query, update, function(err, res) {
+                    if(err) 
+                        throw err;
+
+                    //console.log(err);    
+                    //console.log(res);
+
+                    client.close();
+
+                    r("");
                 });
             }); 
         } catch(e) {

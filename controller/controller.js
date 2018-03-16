@@ -2,9 +2,58 @@ const express   = require('express'),
         router  = express.Router(),
         db      = require("../model/db");
 
+function generateRandomKey () {
+    return parseInt(Math.random() * 10000000);
+}
+
 module.exports = (() => {
     router.get("/", (req, res) => {
         res.send("Working");
+    });
+
+    router.post("/addTask", (req, res) => {
+        if(!req.session.user) {
+            res.send("loginError");
+            return false;
+        }
+
+        let user    = req.session.user;
+        let tasks   = user.task;
+
+        tasks[generateRandomKey ()] = {
+            "name"  : req.body.taskName,
+            "des"   : req.body.description,
+            "amount": req.body.amount,
+            "createdTime" : new Date().toLocaleString(),
+            "updatedTime" : new Date().toLocaleString()
+        }
+        let query = {
+            email : req.session.user.email
+        };
+        
+        db.update(query, {task : tasks}).then(() => {
+            res.send(tasks);
+        });
+    });
+
+    router.post("/removeTask", (req, res) => {
+
+    });
+
+    router.post("/updateTask", (req, res) => {
+        if(!req.session.user) {
+            res.send("loginError");
+            return false;
+        }
+    });
+
+    router.get("/getAllTask", (req, res) => {
+        if(!req.session.user) {
+            res.send("loginError");
+            return false;
+        } else {
+            res.send(req.session.user.task);
+        }
     });
 
     router.post("/login", (req, res) => {
@@ -26,21 +75,19 @@ module.exports = (() => {
 
     router.get("/logout", (req, res) => {
         req.session.destroy();
+        res.send("success");
     });
 
     router.post("/signup", (req, res) => {
         let query       = {"email" : req.body.email};
 
         db.getData(query).then((result) => {
-            console.log(result);
             if(result.length === 0) {
                 let data = req.body;
                 data["task"] = {};
                 db.insert(req.body);
-                console.log("1");
                 res.send("singned up");
             } else {
-                console.log("2");
                 res.send("user exists");
             }
         });

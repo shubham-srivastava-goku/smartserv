@@ -22,6 +22,7 @@ app.use((req, res, next) => {
             req.session.checked = true;
             res.redirect("/view/login.html");
         } else {
+            req.session.checked = false;
             next();
         }
     } else {
