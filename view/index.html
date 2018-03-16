@@ -68,7 +68,35 @@
         
         </div>
     </div>
+    <div id="updateModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form id="updateRecord" method="post" role="form">
+                            <div class="form-group">
+                                <input type="text" name="taskName1" id="taskName1" tabindex="1" class="form-control" placeholder="Task Name" value="">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="description1" id="description1" tabindex="1" class="form-control" placeholder="Description" value="">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="amount1" id="amount1" tabindex="2" class="form-control" placeholder="Amount">
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-6 col-sm-offset-3">
+                                        <input type="submit" name="register-submit1" id="register-submit1" tabindex="4" class="form-control btn btn-register" value="Update Task">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
     <script>
+        let task = {};
         (() => {
             $.get({
                 url : "/getAllTask",
@@ -82,21 +110,98 @@
                     for(let i in res) {
                         data    += "<tr id='" + i + "'>"
                                     + "<td>" + res[i].name + "</td>"
-                                    + "<td>" + res[i].desc + "</td>"
+                                    + "<td>" + res[i].des + "</td>"
                                     + "<td>" + res[i].amount + "</td>"
                                     + "<td>" + res[i].createdTime + "</td>"
                                     + "<td>" + res[i].updatedTime + "</td>"
-                                    + "<td><button class='btn' onclick='edit(\"" + i + "\")'>Edit</button></td>"
+                                    + "<td><button class='btn' onclick='edit(\"" + i + "\")'>Edit</button>&nbsp;"
+                                    + "<button class='btn' onclick='deleteTask(\"" + i + "\")'>Delete</button></td>"
                                 + "</tr>";
                     }
 
                     $("#tbody").html(data);
+                    task = res;
                 }
             });
         })();
 
         $("#addNew").click(() => {
             $("#myModal").modal("show");
+        });
+
+        let updateId = 0;
+
+        function edit(id) {
+            updateId = id;
+            let data = task[id];
+            
+            $("#taskName1").val(data.name);
+            $("#description1").val(data.des);
+            $("#amount1").val(data.amount);
+
+            $("#updateModal").modal("show");
+        }
+
+        function deleteTask(id) {
+            $("#" + id).remove();
+            let data = {};
+            data["id"] = id;
+            $.ajax({
+                url : "/removeTask",
+                data : data,
+                type : "POST",
+                success : (res) => {
+                    if(typeof res === "string" && res.indexOf("loginError") !== -1) {
+                        window.location.href("/view/login.html");
+                        return false;
+                    }
+                }
+            });
+        }
+
+        $("#updateRecord").submit((e) => {
+            e.preventDefault();
+
+            let tempData = $('#updateRecord').serializeArray();
+
+            let data = tempData.reduce((x, y) => {
+                x[y.name] = y.value;
+
+                return x;
+            }, {});
+
+            data["id"] = updateId;
+
+            $.ajax({
+                url : "/updateTask",
+                data : data,
+                type : "POST",
+                success : (res) => {
+                    if(typeof res === "string" && res.indexOf("loginError") !== -1) {
+                        window.location.href("/view/login.html");
+                        return false;
+                    }
+
+                    task = res;
+
+                    var data = "";
+                    for(let i in res) {
+                        data    += "<tr id='" + i + "'>"
+                                    + "<td>" + res[i].name + "</td>"
+                                    + "<td>" + res[i].des + "</td>"
+                                    + "<td>" + res[i].amount + "</td>"
+                                    + "<td>" + res[i].createdTime + "</td>"
+                                    + "<td>" + res[i].updatedTime + "</td>"
+                                    + "<td><button class='btn' onclick='edit(\"" + i + "\")'>Edit</button>&nbsp;"
+                                    + "<button class='btn' onclick='delete(\"" + i + "\")'>Delete</button></td>"
+                                + "</tr>";
+                    }
+
+                    $("#tbody").html(data);
+
+                    $("#updateModal").modal("hide");
+                }
+            });
         });
 
         $("#creatRecord").submit((e) => {
@@ -114,12 +219,30 @@
                 url : "/addTask",
                 data : data,
                 type : "POST",
-                succuss : (res) => {
-
-                    if(res.indexOf("loginError") !== -1) {
+                success : (res) => {
+                    if(typeof res === "string" && res.indexOf("loginError") !== -1) {
                         window.location.href("/view/login.html");
                         return false;
                     }
+
+                    task = res;
+
+                    var data = "";
+                    for(let i in res) {
+                        data    += "<tr id='" + i + "'>"
+                                    + "<td>" + res[i].name + "</td>"
+                                    + "<td>" + res[i].des + "</td>"
+                                    + "<td>" + res[i].amount + "</td>"
+                                    + "<td>" + res[i].createdTime + "</td>"
+                                    + "<td>" + res[i].updatedTime + "</td>"
+                                    + "<td><button class='btn' onclick='edit(\"" + i + "\")'>Edit</button>&nbsp;"
+                                    + "<button class='btn' onclick='delete(\"" + i + "\")'>Delete</button></td>"
+                                + "</tr>";
+                    }
+
+                    $("#tbody").html(data);
+
+                    $("#myModal").modal("hide");
                 }
             });
         });

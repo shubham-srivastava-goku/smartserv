@@ -27,6 +27,7 @@ module.exports = (() => {
             "createdTime" : new Date().toLocaleString(),
             "updatedTime" : new Date().toLocaleString()
         }
+
         let query = {
             email : req.session.user.email
         };
@@ -37,7 +38,23 @@ module.exports = (() => {
     });
 
     router.post("/removeTask", (req, res) => {
+        if(!req.session.user) {
+            res.send("loginError");
+            return false;
+        }
 
+        let user    = req.session.user;
+        let tasks   = user.task;
+
+        delete tasks[req.body.id];
+
+        let query = {
+            email : req.session.user.email
+        };
+        
+        db.update(query, {task : tasks}).then(() => {
+            res.send(tasks);
+        });
     });
 
     router.post("/updateTask", (req, res) => {
@@ -45,6 +62,22 @@ module.exports = (() => {
             res.send("loginError");
             return false;
         }
+
+        let user    = req.session.user;
+        let tasks   = user.task;
+
+        tasks[req.body.id]["name"]          = req.body.taskName1;
+        tasks[req.body.id]["des"]           = req.body.description1;
+        tasks[req.body.id]["amount"]        = req.body.amount1;
+        tasks[req.body.id]["updatedTime"]   = new Date().toLocaleString();
+
+        let query = {
+            email : req.session.user.email
+        };
+        
+        db.update(query, {task : tasks}).then(() => {
+            res.send(tasks);
+        });
     });
 
     router.get("/getAllTask", (req, res) => {
